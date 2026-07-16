@@ -8,10 +8,6 @@ on:
 
 jobs:
   renew:
-    permissions:
-      contents: read
-      secrets: write
-
     runs-on: ubuntu-latest
 
     steps:
@@ -48,7 +44,7 @@ jobs:
 
       - name: Update STORAGE_STATE_B64 secret (持久化最新会话)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           ENCODED=$(base64 -w0 storage_state.json)
           gh secret set STORAGE_STATE_B64 --body "$ENCODED" --repo ${{ github.repository }}
