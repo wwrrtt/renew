@@ -10,26 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
-      - name: Install dependencies
-        run: |
-          pip install cloakbrowser playwright
-          python -m playwright install-deps chromium
+      - name: Install CloakBrowser
+        run: pip install cloakbrowser
 
-      - name: Restore storage_state from secret
+      - name: Restore storage_state
         env:
           STORAGE_B64: ${{ secrets.STORAGE_STATE_B64 }}
-        run: |
-          echo "$STORAGE_B64" | base64 -d > storage_state.json
+        run: echo "$STORAGE_B64" | base64 -d > storage_state.json
 
-      - name: Run renewal script
+      - name: Run renewal
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
