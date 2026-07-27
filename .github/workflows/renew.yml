@@ -1,0 +1,41 @@
+name: Renew ZenodeHost
+
+on:
+  schedule:
+    # 每天 UTC 12:00 执行（北京时间 20:00）
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install cloakbrowser
+
+      - name: Run renew (API-only mode)
+        run: python renew.py --api-only
+        env:
+          STORAGE_STATE_JSON: ${{ secrets.STORAGE_STATE_JSON }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+
+      - name: Commit updated state
+        run: |
+          git config user.name "renew-bot[bot]"
+          git config user.email "renew-bot@users.noreply.github.com"
+          git add storage_state.json
+          if git diff --quiet --cached; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: renew zenode session state"
+            git push
+          fi
