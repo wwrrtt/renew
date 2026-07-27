@@ -2,7 +2,6 @@ name: Renew ZenodeHost
 
 on:
   schedule:
-    # 每天 UTC 12:00 执行（北京时间 20:00）
     - cron: '0 12 * * *'
   workflow_dispatch:
 
@@ -22,14 +21,17 @@ jobs:
         run: pip install cloakbrowser
 
       - name: Setup Xray proxy
+        env:
+          XRAY_CONFIG_JSON: ${{ secrets.XRAY_CONFIG_JSON }}
         run: |
           curl -sL -o xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
           unzip -q xray.zip -d xray
           chmod +x xray/xray
-          echo '${{ secrets.XRAY_CONFIG_JSON }}' > xray_config.json
+          python -c "import os; open('xray_config.json','w').write(os.environ['XRAY_CONFIG_JSON'])"
+          echo "=== Xray config written ==="
           ./xray/xray run -c xray_config.json &
           echo "XRAY_PID=$!" >> $GITHUB_ENV
-          sleep 2
+          sleep 3
           echo "=== Current IP (via proxy) ==="
           curl -s --socks5 127.0.0.1:10808 https://ip.sb
           echo ""
