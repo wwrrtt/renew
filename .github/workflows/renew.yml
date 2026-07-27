@@ -21,12 +21,26 @@ jobs:
       - name: Install dependencies
         run: pip install cloakbrowser
 
-      - name: Run renew (API-only mode)
+      - name: Setup Xray proxy
+        run: |
+          curl -sL -o xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
+          unzip -q xray.zip -d xray
+          chmod +x xray/xray
+          echo '${{ secrets.XRAY_CONFIG_JSON }}' > xray_config.json
+          ./xray/xray run -c xray_config.json &
+          echo "XRAY_PID=$!" >> $GITHUB_ENV
+          sleep 2
+          echo "=== Current IP (via proxy) ==="
+          curl -s --socks5 127.0.0.1:10808 https://ip.sb
+          echo ""
+
+      - name: Run renew
         run: python renew.py --api-only
         env:
           STORAGE_STATE_JSON: ${{ secrets.STORAGE_STATE_JSON }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          PROXY_SOCKS5: socks5://127.0.0.1:10808
 
       - name: Commit updated state
         run: |
@@ -39,3 +53,7 @@ jobs:
             git commit -m "chore: renew zenode session state"
             git push
           fi
+
+      - name: Cleanup xray
+        if: always()
+        run: kill ${{ env.XRAY_PID }} 2>/dev/null && echo "Xray stopped" || echo "Xray already stopped"
