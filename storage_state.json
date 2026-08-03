@@ -2,10 +2,10 @@
   "cookies": [
     {
       "name": "connect.sid",
-      "value": "s%3ATI9yspGa89oBQtDFyNzdvIzXTp7fAVX3.IMgXz%2B4jfwzU%2FS097YdNHq0RjJ4oBr5MWlv3lRBHajE",
+      "value": "s%3ANMgNsb-SDtKOZH8qgUyYnn6nb0YfvVJw.ppcSTzbqsjv5x%2BSEnsb9PYJZU0lfVn5KsET2Cs1yJJ0",
       "domain": ".zenode.fr",
       "path": "/",
-      "expires": 1785762457.19961,
+      "expires": 1785853568.704168,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
